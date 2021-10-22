@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include <stack>
 #include <limits>
+#include "assert.h"
 using namespace std;
 
 
@@ -830,8 +831,35 @@ public:
         return;
     }
     
-    
+    //200.岛屿数量
+     void searchIsland(vector<vector<char>>& grid,int i,int j){
+        if(i>=0 && i<n && j<m && j>=0 && grid[i][j]=='1'){
+            grid[i][j]='0';
+            searchIsland(grid,i+1,j);
+            searchIsland(grid,i,j+1);
+            searchIsland(grid,i-1,j);
+            searchIsland(grid,i,j-1);
+        }
+        return;
+    }
 
+    int n,m;
+    int numIslands(vector<vector<char>>& grid) {
+        n = grid.size();
+        m = grid[0].size();
+        int ans{0};
+        for(int i=0;i<n;i++){
+            for(int j=0;j<m;j++){
+                if(grid[i][j]=='1'){
+                    searchIsland(grid,i,j);
+                    ans++;
+                }
+            }
+        }
+        return ans;
+    }
+
+    //
 
 };
 
@@ -991,9 +1019,17 @@ int main(){
     // cout<<s.rob(root);
 
     //75.颜色分类
-    vector<int> vec{2,0,2,1,1,0};
-    s.sortColors(vec);
-    for_each(vec.begin(),vec.end(),[](int v){cout<<v<<"\t";});
+    // vector<int> vec{2,0,2,1,1,0};
+    // s.sortColors(vec);
+    // for_each(vec.begin(),vec.end(),[](int v){cout<<v<<"\t";});
 
+    //200.岛屿数量
+    vector<vector<char>> grid{
+        {'1','1','0','0','0'},
+        {'1','1','0','0','0'},
+        {'0','0','1','0','0'},
+        {'0','0','0','1','1'}
+    };
+    cout<<s.numIslands(grid);
 
 }
