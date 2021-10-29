@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include <stack>
 #include <limits>
+#include <unordered_set>
 #include "assert.h"
 using namespace std;
 
@@ -859,7 +860,76 @@ public:
         return ans;
     }
 
-    //
+    //142. 环形链表 II
+    // ListNode *detectCycle(ListNode *head) {
+        
+
+        
+    // }
+
+    //128. 最长连续序列
+    int longestConsecutive(vector<int>& nums) {
+        if(nums.size()==0) return 0;
+        unordered_set<int> numsHash;
+        for(auto& n : nums){
+            numsHash.insert(n);
+        }
+        int ans{1},currAns{1};
+        for(auto n : numsHash){
+            if(!numsHash.count(n-1)){
+                int currNum=n;
+                int currAns=1;
+                while(numsHash.count(currNum+1)){
+                    currNum++;
+                    currAns++;
+                }
+                ans = max(currAns,ans);
+            }
+        }
+        return ans; 
+
+    }
+
+    //207. 课程表
+    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
+
+        // vector<ListNode*> preList;
+        unordered_map<int,vector<int>> hashIndex;
+        //建立映射关系
+        for(auto& p:prerequisites){
+            hashIndex[p[0]].emplace_back(p[1]);
+        }
+        //遍历映射关系找出循环
+        queue<int> queCourse;
+        set<int> preSet;
+        for(auto& m:hashIndex){
+            preSet.insert(m.first);
+            for(int i=0;i<m.second.size();i++){
+                queCourse.emplace(m.second[i]);
+                preSet.insert(m.second[i]);
+            }
+            while(!queCourse.empty()){
+                int curr = queCourse.front();
+                if(preSet.count(curr)){
+                    for(int i=0;i<hashIndex[curr].size();i++){
+                        queCourse.emplace(m.second[i]);
+                        preSet.insert(m.second[i]);
+                    }
+                    
+                }else{
+                    return false;
+                }
+            }
+            
+        }
+
+        return false;
+    }
+
+    //198. 打家劫舍
+    int rob(vector<int>& nums) {
+
+    }
 
 };
 
@@ -1023,13 +1093,28 @@ int main(){
     // s.sortColors(vec);
     // for_each(vec.begin(),vec.end(),[](int v){cout<<v<<"\t";});
 
-    //200.岛屿数量
-    vector<vector<char>> grid{
-        {'1','1','0','0','0'},
-        {'1','1','0','0','0'},
-        {'0','0','1','0','0'},
-        {'0','0','0','1','1'}
+    // //200.岛屿数量
+    // vector<vector<char>> grid{
+    //     {'1','1','0','0','0'},
+    //     {'1','1','0','0','0'},
+    //     {'0','0','1','0','0'},
+    //     {'0','0','0','1','1'}
+    // };
+    // cout<<s.numIslands(grid);
+
+    //128. 最长连续序列
+    // vector<int> vec{100,4,200,1,3,2};
+    // cout<<s.longestConsecutive(vec);
+
+    //207.课程表
+    vector<vector<int>> prerequisites{
+        {1,0},
+        {0,1}
     };
-    cout<<s.numIslands(grid);
+    int numCourses{2};
+    cout<<s.canFinish(numCourses,prerequisites);
+
+    //198. 打家劫舍
+    
 
 }
