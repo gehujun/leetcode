@@ -926,11 +926,259 @@ public:
         return false;
     }
 
-    //198. 打家劫舍
+    //198. 打家劫舍 - 动态规划
     int rob(vector<int>& nums) {
+        vector<vector<int>> dpTable;
+        dpTable.emplace_back(vector<int>{0,0});
+        for(int i=1;i<=nums.size();i++){
+            int selectCurr = nums[i-1]+dpTable[i-1][1];
+            int notSelectCurr = max(dpTable[i-1][0],dpTable[i-1][1]);
+            dpTable.emplace_back(vector<int>{selectCurr,notSelectCurr});
+        }
+        return max(dpTable.back()[0],dpTable.back()[1]);
+    }
+
+    //416. 分割等和子集
+    bool canPartition(vector<int>& nums) {
+        //贪心：先排序，始终将最高的填到最大空闲的哪一边
+        // //错误：用例：【3，3，3，4，5】
+        // sort(nums.begin(),nums.end());
+        // int sum{0};
+        // for(auto& n:nums){
+        //     sum += n;
+        // }
+        // if(sum%2==1) return false;
+        // int left{sum/2},right{sum/2};
+        // for(int i=nums.size()-1;i>=0;i--){
+        //     if(nums[i]>max(left,right))
+        //         return false;
+        //     if(left<right){
+        //         right -= nums[i];
+        //     }else{
+        //         left -= nums[i];
+        //     }
+        // }
+        // return true;
+
+        //如果总和为奇数则false，如果元素小于2则false，如果最大元素大于一半则false
+        int n = nums.size();
+        if(n<2) return false;
+        sort(nums.begin(),nums.end());
+        
+        int sum{0};
+        for(auto& n:nums){
+            sum += n;
+        }
+        if(sum%2==1) return false;
+        int target = sum/2;
+        if(target< nums.back()) return false;
+        
+        vector<vector<int>> ans(n,vector<int>(target+1));
+        
+
 
     }
 
+    //438. 找到字符串中所有字母异位词
+    vector<int> findAnagrams(string s, string p) {
+        // if(s.size()<p.size()) return vector<int>{};
+        // queue<char> matchWindow;
+        // unordered_map<char,int> cntChar;
+        // vector<int> ans;
+        // //1.收集p信息
+        // for(int i=0;i<p.size();i++){
+        //     char c = p[i];
+        //     if(!cntChar.count(p[i])){
+        //         cntChar[c] = 1;
+        //     }else 
+        //         cntChar[c] ++;
+        // }
+        // //2.初始化窗口
+        // int cnt{0};
+        // int i;
+        // for(i=0;i<p.size();i++){
+        //     char c = s[i];
+        //     matchWindow.emplace(c);
+        //     if(!cntChar.count(c)){
+        //         cnt++;
+        //     }else{
+        //         cntChar[c]--;
+        //         if(cntChar[c]<0){
+        //             cnt++;
+        //         }    
+        //     }
+        // }
+        
+        // //3.滑动窗口遍历s
+        // for(int j=0;j<s.size()-p.size();i++,j++){
+        //     if(cnt==0) ans.push_back(i-p.size());
+        //     char c1 = matchWindow.front();
+        //     matchWindow.pop();
+        //     if(cntChar.count(c1)){
+        //         cntChar[c1]++;
+        //         if(cntChar[c1]>0) cnt++;
+        //     }
+        //     char c2 = s[i];
+        //     matchWindow.emplace(c2);
+        //     if(cntChar.count(c2)){
+        //         cntChar[c2]--;
+        //         if(cntChar[c2]>=0) cnt--;
+        //     }
+            
+        // }
+        // if(cnt==0) ans.push_back(i-p.size());
+        // return ans;
+
+        // //内存优化：滑动窗口用双指针,用数组代替map
+        if(s.size()<p.size()) return vector<int>{};
+        // unordered_map<char,int> cntChar;
+        int cntChar[26]{INT32_MIN};
+        vector<int> ans;
+        //1.收集p信息
+        for(int i=0;i<p.size();i++){
+            char c = p[i];
+            if(cntChar[c-'a']==INT32_MIN){
+                cntChar[c-'a']=1;
+            }else{
+                cntChar[c-'a']++;
+            }
+        }
+        //2.初始化窗口
+        int l{0},i{0};
+        int cnt{0};
+        for(;i<p.size();i++){
+            char c = s[i];
+            if(cntChar[c-'a']==INT32_MIN){
+                cnt++;
+            }else{
+                cntChar[c-'a']--;
+                if(cntChar[c-'a']<0){
+                    cnt++;
+                }    
+            }
+        }
+        //3.滑动窗口遍历s
+        for(int j=0;j<s.size()-p.size();i++,j++){
+            if(cnt==0) ans.push_back(i-p.size());
+            char c1 = s[l];
+            l++;
+            if(cntChar[c1-'a']!=INT32_MIN){
+                cntChar[c1-'a']++;
+                if(cntChar[c1-'a']>0) cnt++;
+            }
+            char c2 = s[i];
+            if(cntChar[c2-'a']!=INT32_MIN){
+                cntChar[c2-'a']--;
+                if(cntChar[c2-'a']>=0) cnt--;
+            }
+            
+        }
+        if(cnt==0) ans.push_back(i-p.size());
+        return ans;
+    }
+
+    //98. 验证二叉搜索树-中序遍历递增数组
+    void midSearch(TreeNode* node,vector<int>& val){
+        if(node==nullptr) return;
+        midSearch(node->left,val);
+        val.push_back(node->val);
+        midSearch(node->right,val);
+    }
+    bool isValidBST(TreeNode* root) {
+        // if(root==nullptr) return true;
+        // bool left{true},right{true};
+        // if(root->left){
+        //     left = isValidBST(root->left);
+        //     if(root->left->val > root->val)
+        //         return false;
+        // }
+        // if(root->right){
+        //     right = isValidBST(root->right);
+        //     if(root->right->val < root->val)
+        //         return false;   
+        // }
+        vector<int> vals;
+        midSearch(root,vals);
+        for(int i=1;i<vals.size();i++){
+            if(vals[i]<=vals[i-1])
+                return false;
+        }
+        return true;
+    }
+
+};
+
+//146. LRU 缓存机制
+struct DLinkedNode{
+    int key; int value;
+    DLinkedNode* prev;
+    DLinkedNode* next;
+    DLinkedNode():key(0),value(0),prev(nullptr),next(nullptr){}
+    DLinkedNode(int k,int v):key(k),value(v),prev(nullptr),next(nullptr){}
+};
+
+class LRUCache {
+private:
+    unordered_map<int,DLinkedNode*> map;
+    DLinkedNode* head;
+    DLinkedNode* tail;
+    int size;
+    int capacity;
+public:
+    LRUCache(int capacity) {
+        this->capacity = capacity;
+        this->size = 0;
+        head = new DLinkedNode();
+        tail = new DLinkedNode();
+        head->next = tail;
+        tail->prev = head;
+    }
+    
+    int get(int key) {
+        if(!map.count(key)){
+            return -1;
+        }
+        DLinkedNode* node = map[key];
+        moveToHead(node);
+        return node->value;
+    }
+    
+    void put(int key, int value) {
+        if(map.count(key)){
+            //缓存有这个键值对
+            moveToHead(map[key]);
+        }else{            
+            DLinkedNode* node = new DLinkedNode(key,value);
+            map[key] = node;
+            addToHead(node);
+            if(size<capacity){                                
+                size++;
+            }else{
+                removeNode();                
+            }
+        }
+    }
+
+    void removeNode(){
+        DLinkedNode* node = tail->prev;
+        node->prev->next = tail;
+        tail->prev = node->prev;
+        map.erase(node->key);
+        delete node;
+    }
+
+    void addToHead(DLinkedNode* node){
+        node->next = head->next;
+        head->next->prev = node;
+        node->prev = head;
+        head->next = node;
+    }
+
+    void moveToHead(DLinkedNode* node){
+        node->prev->next = node->next;
+        node->next->prev = node->prev;
+        addToHead(node);
+    }
 };
 
 int main(){
@@ -1107,14 +1355,54 @@ int main(){
     // cout<<s.longestConsecutive(vec);
 
     //207.课程表
-    vector<vector<int>> prerequisites{
-        {1,0},
-        {0,1}
-    };
-    int numCourses{2};
-    cout<<s.canFinish(numCourses,prerequisites);
+    // vector<vector<int>> prerequisites{
+    //     {1,0},
+    //     {0,1}
+    // };
+    // int numCourses{2};
+    // cout<<s.canFinish(numCourses,prerequisites);
 
     //198. 打家劫舍
-    
+    // vector<int> nums{1,2,3,1};
+    // cout<<s.rob(nums);
+
+    //416. 分割等和子集
+    // vector<int> nums{1,5,11,5};
+    // cout<<s.canPartition(nums);
+
+    //146. LRU 缓存机制
+    // LRUCache* cache = new LRUCache(2);
+    // cout<<"put(1,1)"<<endl;
+    // cache->put(1,1);
+    // cout<<"put(2,2)"<<endl;
+    // cache->put(2,2);
+    // cout<<"get 1: ";
+    // cout<<cache->get(1)<<endl;
+    // cout<<"put(3,3)"<<endl;
+    // cache->put(3,3);
+    // cout<<"get 2: ";
+    // cout<<cache->get(2)<<endl;
+    // cout<<"put(4,4)"<<endl;
+    // cache->put(4,4);
+    // cout<<"get 1: ";
+    // cout<<cache->get(1)<<endl;
+    // cout<<"get 3: ";
+    // cout<<cache->get(3)<<endl;
+    // cout<<"get 4: ";
+    // cout<<cache->get(4)<<endl;
+
+    //438. 找到字符串中所有字母异位词
+    // string ss{"cbaebabacd"};
+    // string pp{"abc"};
+    // vector<int> ans = s.findAnagrams(ss,pp);
+    // for(auto &i:ans){
+    //     cout<<i<<" ";
+    // }
+
+    //98. 验证二叉搜索树
+    vector<int> v{5,4,6,-1,-1,3,7};
+    TreeNode* root = createTree(v);
+    printTree(root);
+    cout<<s.isValidBST(root);
 
 }
