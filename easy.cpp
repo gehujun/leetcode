@@ -127,7 +127,36 @@ public:
             return 0;
     }
 
-    
+    //21.合并两个有序链表
+    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
+        if(l1 == nullptr) return l2;
+        if(l2 == nullptr) return l1;
+        ListNode* head = new ListNode();
+        
+        ListNode* ans = head;
+        for (;;){
+            if(l1->val > l2->val){
+                ans->next = l2;
+                l2 = l2->next;
+                ans = ans->next;
+            }else{
+                ans->next = l1;
+                l1 = l1->next;
+                ans = ans->next;
+            }
+            if(l1 == nullptr){
+                ans->next = l2;
+                break;
+            }
+            if(l2 == nullptr){
+                ans->next = l1;
+                break;
+            }
+        }
+        ans = head->next;
+        delete head;
+        return ans;
+    }
     
 };
 
